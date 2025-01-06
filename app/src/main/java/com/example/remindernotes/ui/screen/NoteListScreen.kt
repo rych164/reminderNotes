@@ -13,7 +13,11 @@ import com.example.remindernotes.ui.viewmodel.NotesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteListScreen(viewModel: NotesViewModel) {
+fun NoteListScreen(
+    viewModel: NotesViewModel,
+    onAddClicked: () -> Unit,
+    onEditClicked: (Note) -> Unit
+) {
     val noteList by viewModel.notes.collectAsState()
 
     Scaffold (
@@ -23,11 +27,7 @@ fun NoteListScreen(viewModel: NotesViewModel) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-
-                }
-            ) {
+            FloatingActionButton(onClick = onAddClicked) {
                 Text("+")
             }
         }
@@ -37,11 +37,10 @@ fun NoteListScreen(viewModel: NotesViewModel) {
             modifier = Modifier.fillMaxSize()
         ) {
             items(noteList) { note ->
-                NoteItem(note,
+                NoteItem(
+                    note,
                     onDelete = { viewModel.deleteNote(note) },
-                    onEdit = {
-
-                    }
+                    onEdit = { onEditClicked(note) }
                 )
             }
         }

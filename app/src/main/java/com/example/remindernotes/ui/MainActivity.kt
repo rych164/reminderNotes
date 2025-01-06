@@ -18,6 +18,10 @@ import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import com.example.remindernotes.ui.screen.MainScreen
 
 class MainActivity : ComponentActivity() {
     private lateinit var notesViewModel: NotesViewModel
@@ -66,7 +70,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ReminderNotesTheme {
-                NoteListScreen(notesViewModel)
+                MainScreen(notesViewModel)
             }
         }
     }
