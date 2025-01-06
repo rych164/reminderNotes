@@ -13,7 +13,7 @@ class NotificationReceiver : BroadcastReceiver() {
         val noteTitle = intent.getStringExtra("noteTitle") ?: "Notatka"
         val noteDesciption = intent.getStringExtra("noteDescription") ?: ""
 
-        val notificationId = System.currentTimeMillis().toInt()
+        val notificationId =(System.currentTimeMillis() % Int.MAX_VALUE).toInt()
 
         val builder = NotificationCompat.Builder(context, "notes_channel_id")
             .setSmallIcon(android.R.drawable.ic_dialog_info)

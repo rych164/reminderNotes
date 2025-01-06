@@ -18,4 +18,7 @@ interface NoteDao {
 
     @Delete
     suspend fun deleteNote(note: Note)
+
+    @Query("SELECT * FROM notes WHERE reminderDate IS NOT NULL")
+    suspend fun getNotesWithReminders(): List<Note>
 }

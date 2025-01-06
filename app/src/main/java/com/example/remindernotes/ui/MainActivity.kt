@@ -1,27 +1,25 @@
 package com.example.remindernotes.ui
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.remindernotes.data.db.AppDatabase
 import com.example.remindernotes.data.repository.NoteRepository
-import com.example.remindernotes.ui.screen.NoteListScreen
+import com.example.remindernotes.ui.screen.MainScreen
 import com.example.remindernotes.ui.theme.ReminderNotesTheme
 import com.example.remindernotes.ui.viewmodel.NotesViewModel
 import com.example.remindernotes.ui.viewmodel.NotesViewModelFactory
-import android.os.Build
-import androidx.core.content.ContextCompat
 import android.Manifest
+import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.provider.Settings
+import androidx.core.content.ContextCompat
 import androidx.activity.result.contract.ActivityResultContracts
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import com.example.remindernotes.ui.screen.MainScreen
+
 
 class MainActivity : ComponentActivity() {
     private lateinit var notesViewModel: NotesViewModel
@@ -33,6 +31,11 @@ class MainActivity : ComponentActivity() {
             } else {
 
             }
+        }
+
+    private val exactAlarmPermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
         }
 
     private fun createNotificationChannel() {
@@ -48,6 +51,23 @@ class MainActivity : ComponentActivity() {
         notificationManager?.createNotificationChannel(channel)
     }
 
+    private fun checkAndRequestExactAlarmPermission() {
+        val alarmManager = getSystemService(ALARM_SERVICE) as android.app.AlarmManager
+        if (!alarmManager.canScheduleExactAlarms()) {
+            AlertDialog.Builder(this)
+                .setTitle("Potrzebne uprawnienie")
+                .setMessage("Applikacja potrzebuje uprawnień dokładnych alarmów, aby przypomnienia działy poprawnie. Włącz je w ustawieniach")
+                .setPositiveButton("Otwórz ustawienia") { dialog, which ->
+                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    exactAlarmPermissionsLauncher.launch(intent)
+                }
+                .setNegativeButton("anuluj") { dialog, which ->
+
+                }
+                .show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -60,6 +80,8 @@ class MainActivity : ComponentActivity() {
         ) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
+
+        checkAndRequestExactAlarmPermission()
 
         val db = AppDatabase.getDatabase(this)
         val repository = NoteRepository(db.noteDao())
